@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { TodoTask } from "@/features/tasks/types/task";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
+import { useCategories } from "@/features/categories/hooks/useCategories";
+import { usePriorities } from "@/features/priorities/hooks/usePriorities";
 import TaskList from "@/components/tasks/TaskList";
 import TaskModal from "@/components/tasks/TaskModal";
 import ConfirmDeleteDialog from "@/components/tasks/ConfirmDeleteDialog";
 
 export default function DashboardPage() {
   const { tasks, status, error, deleteTask } = useTasks();
+  const { categories, status: categoryStatus } = useCategories();
+  const { priorities, status: priorityStatus } = usePriorities();
 
   // Modal state (D-01: modal for create/edit, no route change)
   const [modalOpen, setModalOpen] = useState(false);
@@ -17,6 +22,11 @@ export default function DashboardPage() {
   // Delete confirmation state (D-07: confirm before delete)
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const showPrerequisiteBanner =
+    (categories.length === 0 || priorities.length === 0) &&
+    categoryStatus !== "loading" &&
+    priorityStatus !== "loading";
 
   function openCreate() {
     setEditingTask(null);
@@ -64,6 +74,20 @@ export default function DashboardPage() {
           + New Task
         </button>
       </div>
+
+      {showPrerequisiteBanner && (
+        <div className="mb-4 p-3 rounded border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-600 text-sm text-amber-800 dark:text-amber-200">
+          To create tasks, first add a{" "}
+          {categories.length === 0 && (
+            <Link href="/categories" className="underline font-medium">category</Link>
+          )}
+          {categories.length === 0 && priorities.length === 0 && " and "}
+          {priorities.length === 0 && (
+            <Link href="/priorities" className="underline font-medium">priority</Link>
+          )}
+          .
+        </div>
+      )}
 
       {status === "loading" && (
         <p className="text-gray-500 dark:text-gray-400">Loading tasks\u2026</p>

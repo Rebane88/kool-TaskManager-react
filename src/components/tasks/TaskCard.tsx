@@ -8,6 +8,8 @@ interface TaskCardProps {
   task: TodoTask;
   onEdit: (task: TodoTask) => void;
   onDelete: (id: string) => void;
+  categoryName?: string;   // resolved from CategoryProvider by parent
+  priorityName?: string;   // resolved from PriorityProvider by parent
 }
 
 function formatDueDate(dueDt: string): string {
@@ -22,7 +24,7 @@ function formatDueDate(dueDt: string): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
 }
 
-export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
+export default function TaskCard({ task, onEdit, onDelete, categoryName, priorityName }: TaskCardProps) {
   const { toggleComplete } = useTasks();
 
   return (
@@ -53,6 +55,20 @@ export default function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
           <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {formatDueDate(task.dueDt)}
           </span>
+        )}
+        {(priorityName || categoryName) && (
+          <div className="flex gap-1 mt-1">
+            {priorityName && (
+              <span className="text-xs px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
+                {priorityName}
+              </span>
+            )}
+            {categoryName && (
+              <span className="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-100/10 dark:text-blue-300">
+                {categoryName}
+              </span>
+            )}
+          </div>
         )}
       </div>
       <div className="flex items-center gap-1 shrink-0">
