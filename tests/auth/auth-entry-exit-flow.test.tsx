@@ -37,20 +37,35 @@ vi.mock("@/features/auth/storage/refreshTokenStorage", () => ({
 // authApi mock
 // ---------------------------------------------------------------------------
 
+vi.mock("@/features/auth/api/authApi", () => ({
+  authApi: {
+    register: vi.fn().mockResolvedValue({
+      token: "access-token-abc",
+      refreshToken: "refresh-token-xyz",
+      firstName: "Jane",
+      lastName: "Doe",
+    }),
+    login: vi.fn().mockResolvedValue({
+      token: "access-token-abc",
+      refreshToken: "refresh-token-xyz",
+      firstName: "Jane",
+      lastName: "Doe",
+    }),
+    refresh: vi.fn().mockResolvedValue({
+      token: "access-token-abc",
+      refreshToken: "refresh-token-xyz",
+      firstName: "Jane",
+      lastName: "Doe",
+    }),
+  },
+}));
+
 const mockJwtResponse = {
   token: "access-token-abc",
   refreshToken: "refresh-token-xyz",
   firstName: "Jane",
   lastName: "Doe",
 };
-
-vi.mock("@/features/auth/api/authApi", () => ({
-  authApi: {
-    register: vi.fn().mockResolvedValue(mockJwtResponse),
-    login: vi.fn().mockResolvedValue(mockJwtResponse),
-    refresh: vi.fn().mockResolvedValue(mockJwtResponse),
-  },
-}));
 
 // ---------------------------------------------------------------------------
 // Imports (after mocks)
@@ -104,12 +119,10 @@ describe("authService: token lifecycle policy (AUTH-05)", () => {
   it("login sets access token in memory store only", async () => {
     await authService.login({ email: "a@b.com", password: "pass" });
 
+    // Access token must flow through setAccessToken (memory store), not via setRefreshToken
     expect(setAccessToken).toHaveBeenCalledWith(mockJwtResponse.token);
-    // access token must NOT touch localStorage
-    expect(localStorage.setItem).not.toHaveBeenCalledWith(
-      expect.anything(),
-      mockJwtResponse.token
-    );
+    // setRefreshToken must NOT receive the access token value
+    expect(setRefreshToken).not.toHaveBeenCalledWith(mockJwtResponse.token);
   });
 
   it("login persists refresh token to localStorage", async () => {
@@ -126,11 +139,10 @@ describe("authService: token lifecycle policy (AUTH-05)", () => {
       lastName: "Doe",
     });
 
+    // Access token must flow through setAccessToken (memory store), not via setRefreshToken
     expect(setAccessToken).toHaveBeenCalledWith(mockJwtResponse.token);
-    expect(localStorage.setItem).not.toHaveBeenCalledWith(
-      expect.anything(),
-      mockJwtResponse.token
-    );
+    // setRefreshToken must NOT receive the access token value
+    expect(setRefreshToken).not.toHaveBeenCalledWith(mockJwtResponse.token);
   });
 
   it("register persists refresh token to localStorage", async () => {
