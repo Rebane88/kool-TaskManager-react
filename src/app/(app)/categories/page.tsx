@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TodoCategory } from "@/features/categories/types/category";
 import { useCategories } from "@/features/categories/hooks/useCategories";
+import { formatApiError } from "@/lib/api/apiError";
 import CategoryCard from "@/components/categories/CategoryCard";
 import CategoryModal from "@/components/categories/CategoryModal";
 import ConfirmDeleteDialog from "@/components/tasks/ConfirmDeleteDialog";
@@ -43,8 +44,8 @@ export default function CategoriesPage() {
     try {
       await deleteCategory(deletingCategoryId);
       closeDelete();
-    } catch {
-      setDeleteError("Failed to delete category. Please try again.");
+    } catch (err) {
+      setDeleteError(formatApiError(err, "Failed to delete category. Please try again."));
     }
   }
 

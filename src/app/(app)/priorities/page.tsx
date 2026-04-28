@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TodoPriority } from "@/features/priorities/types/priority";
 import { usePriorities } from "@/features/priorities/hooks/usePriorities";
+import { formatApiError } from "@/lib/api/apiError";
 import PriorityCard from "@/components/priorities/PriorityCard";
 import PriorityModal from "@/components/priorities/PriorityModal";
 import ConfirmDeleteDialog from "@/components/tasks/ConfirmDeleteDialog";
@@ -43,8 +44,8 @@ export default function PrioritiesPage() {
     try {
       await deletePriority(deletingPriorityId);
       closeDelete();
-    } catch {
-      setDeleteError("Failed to delete priority. Please try again.");
+    } catch (err) {
+      setDeleteError(formatApiError(err, "Failed to delete priority. Please try again."));
     }
   }
 

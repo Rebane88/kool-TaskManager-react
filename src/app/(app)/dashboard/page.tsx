@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { formatApiError } from "@/lib/api/apiError";
 import { TodoTask } from "@/features/tasks/types/task";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { useCategories } from "@/features/categories/hooks/useCategories";
@@ -57,8 +58,8 @@ export default function DashboardPage() {
     try {
       await deleteTask(deletingTaskId);
       closeDelete();
-    } catch {
-      setDeleteError("Failed to delete task. Please try again.");
+    } catch (err) {
+      setDeleteError(formatApiError(err, "Failed to delete task. Please try again."));
     }
   }
 
