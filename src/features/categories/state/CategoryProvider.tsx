@@ -148,9 +148,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         const category = await categoryService.create(req);
         dispatch({ type: "CATEGORY_CREATED", payload: category });
       } catch (err) {
-        const message = formatApiError(err, "Failed to create category");
-        dispatch({ type: "CATEGORIES_ERROR", payload: message });
-        throw err; // re-throw so UI can handle errors
+        throw err; // form handles display via formatApiError
       }
     },
     []
@@ -167,9 +165,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         const category = await categoryService.update(id, updatedCategory, changes);
         dispatch({ type: "CATEGORY_UPDATED", payload: category });
       } catch (err) {
-        const message = formatApiError(err, "Failed to update category");
-        dispatch({ type: "CATEGORIES_ERROR", payload: message });
-        throw err; // re-throw so UI can handle errors
+        throw err;
       }
     },
     []
@@ -180,9 +176,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
       await categoryService.delete(id);
       dispatch({ type: "CATEGORY_DELETED", payload: id });
     } catch (err) {
-      const message = formatApiError(err, "Failed to delete category");
-      dispatch({ type: "CATEGORIES_ERROR", payload: message });
-      throw err; // re-throw so UI can handle errors
+      throw err;
     }
   }, []);
 

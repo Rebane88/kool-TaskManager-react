@@ -154,9 +154,7 @@ export function PriorityProvider({ children }: { children: ReactNode }) {
         const priority = await priorityService.create(req);
         dispatch({ type: "PRIORITY_CREATED", payload: priority });
       } catch (err) {
-        const message = formatApiError(err, "Failed to create priority");
-        dispatch({ type: "PRIORITIES_ERROR", payload: message });
-        throw err; // re-throw so UI can handle errors
+        throw err;
       }
     },
     []
@@ -172,9 +170,7 @@ export function PriorityProvider({ children }: { children: ReactNode }) {
         await priorityService.update(id, updatedPriority, {});
         dispatch({ type: "PRIORITY_UPDATED", payload: updatedPriority });
       } catch (err) {
-        const message = formatApiError(err, "Failed to update priority");
-        dispatch({ type: "PRIORITIES_ERROR", payload: message });
-        throw err; // re-throw so UI can handle errors
+        throw err;
       }
     },
     []
@@ -185,9 +181,7 @@ export function PriorityProvider({ children }: { children: ReactNode }) {
       await priorityService.delete(id);
       dispatch({ type: "PRIORITY_DELETED", payload: id });
     } catch (err) {
-      const message = formatApiError(err, "Failed to delete priority");
-      dispatch({ type: "PRIORITIES_ERROR", payload: message });
-      throw err; // re-throw so UI can handle errors
+      throw err;
     }
   }, []);
 

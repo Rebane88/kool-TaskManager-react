@@ -144,9 +144,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       const task = await taskService.create(req);
       dispatch({ type: "TASK_CREATED", payload: task });
     } catch (err) {
-      const message = formatApiError(err, "Failed to create task");
-      dispatch({ type: "TASKS_ERROR", payload: message });
-      throw err; // re-throw so UI can handle errors
+      throw err;
     }
   }, []);
 
@@ -160,9 +158,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         const updated = await taskService.update(id, task, changes);
         dispatch({ type: "TASK_UPDATED", payload: updated });
       } catch (err) {
-        const message = formatApiError(err, "Failed to update task");
-        dispatch({ type: "TASKS_ERROR", payload: message });
-        throw err; // re-throw so UI can handle errors
+        throw err;
       }
     },
     []
@@ -173,9 +169,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       await taskService.delete(id);
       dispatch({ type: "TASK_DELETED", payload: id });
     } catch (err) {
-      const message = formatApiError(err, "Failed to delete task");
-      dispatch({ type: "TASKS_ERROR", payload: message });
-      throw err; // re-throw so UI can handle errors
+      throw err;
     }
   }, []);
 
@@ -186,9 +180,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       });
       dispatch({ type: "TASK_UPDATED", payload: updated });
     } catch (err) {
-      const message = formatApiError(err, "Failed to toggle task");
-      dispatch({ type: "TASKS_ERROR", payload: message });
-      throw err; // re-throw so UI can handle errors
+      throw err;
     }
   }, []);
 
