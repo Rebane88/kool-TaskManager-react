@@ -120,7 +120,8 @@ describe("PriorityProvider: updatePriority — PRIO-03", () => {
     vi.mocked(priorityService.create).mockResolvedValue(fakePriority);
     // priorityService.update returns void — the provider must use the request payload
     // as the updated entity since the API returns no body (Pitfall 3 pattern)
-    vi.mocked(priorityService.update).mockResolvedValue(undefined);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(priorityService.update).mockResolvedValue(undefined as any);
 
     renderWithProvider();
 

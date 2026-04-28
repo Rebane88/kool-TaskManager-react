@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/features/auth/state/AuthProvider";
 import { TaskProvider } from "@/features/tasks/state/TaskProvider";
+import { CategoryProvider } from "@/features/categories/state/CategoryProvider";
+import { PriorityProvider } from "@/features/priorities/state/PriorityProvider";
 
 export const metadata: Metadata = {
   title: "TaskManager",
@@ -16,9 +18,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* TaskProvider is nested inside AuthProvider so it can read useAuth().status */}
+        {/*
+         * All three feature providers are nested inside AuthProvider so they
+         * can read useAuth().status for auth-gated initial fetches (Pitfall 4).
+         * CategoryProvider and PriorityProvider wrap TaskProvider so all pages
+         * can access category and priority data without prop drilling (ARCH-01).
+         */}
         <AuthProvider>
-          <TaskProvider>{children}</TaskProvider>
+          <CategoryProvider>
+            <PriorityProvider>
+              <TaskProvider>{children}</TaskProvider>
+            </PriorityProvider>
+          </CategoryProvider>
         </AuthProvider>
       </body>
     </html>
