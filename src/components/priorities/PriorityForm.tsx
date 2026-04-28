@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { TodoPriority } from "@/features/priorities/types/priority";
 import { usePriorities } from "@/features/priorities/hooks/usePriorities";
+import { formatApiError } from "@/lib/api/apiError";
 
 interface PriorityFormProps {
   priority: TodoPriority | null; // null = create mode, TodoPriority = edit mode
@@ -40,7 +41,7 @@ export default function PriorityForm({ priority, onClose }: PriorityFormProps) {
       }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save priority");
+      setError(formatApiError(err, "Failed to save priority"));
     } finally {
       setSubmitting(false);
     }

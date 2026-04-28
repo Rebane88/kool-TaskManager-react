@@ -20,6 +20,10 @@ import { ApiError } from "@/lib/api/apiError";
 export default function LoginPage() {
   const { status, login } = useAuth();
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -30,10 +34,6 @@ export default function LoginPage() {
   if (status === "restoring" || status === "authenticated") {
     return <div aria-label="Loading session">Loading...</div>;
   }
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,6 +41,7 @@ export default function LoginPage() {
 
     // Required field validation (T-01-12)
     if (!email.trim() || !password) {
+      setError("Email and password are required.");
       return;
     }
 

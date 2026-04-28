@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import { TodoTask } from "@/features/tasks/types/task";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
+import { EMPTY_GUID } from "@/lib/constants";
+import { formatApiError } from "@/lib/api/apiError";
 
 interface TaskFormProps {
-  task: TodoTask | null; // null = create mode (empty form), TodoTask = edit mode (pre-filled)
+  task?: TodoTask | null; // undefined/null = create mode (empty form), TodoTask = edit mode (pre-filled)
   onClose: () => void;
 }
 
@@ -49,18 +51,18 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         // Create mode: send full CreateTaskRequest with all required defaults
         await createTask({
           taskName: trimmedName,
-          taskSort: Date.now(), // timestamp-based sort for natural ordering (D-03 discretion)
+          taskSort: 0,
           dueDt: dueDtIso,
           isCompleted: false,
           isArchived: false,
-          todoCategoryId: null, // Phase 2: no category assignment yet
-          todoPriorityId: null, // Phase 2: no priority assignment yet
+          todoCategoryId: EMPTY_GUID,
+          todoPriorityId: EMPTY_GUID,
           syncDt: new Date().toISOString(),
         });
       }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save task");
+      setError(formatApiError(err, "Failed to save task"));
     } finally {
       setSubmitting(false);
     }

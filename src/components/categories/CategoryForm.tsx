@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { TodoCategory } from "@/features/categories/types/category";
 import { useCategories } from "@/features/categories/hooks/useCategories";
+import { formatApiError } from "@/lib/api/apiError";
 
 interface CategoryFormProps {
   category: TodoCategory | null; // null = create mode, TodoCategory = edit mode
@@ -40,7 +41,7 @@ export default function CategoryForm({ category, onClose }: CategoryFormProps) {
       }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save category");
+      setError(formatApiError(err, "Failed to save category"));
     } finally {
       setSubmitting(false);
     }

@@ -8,10 +8,11 @@ import PriorityModal from "@/components/priorities/PriorityModal";
 import ConfirmDeleteDialog from "@/components/tasks/ConfirmDeleteDialog";
 
 export default function PrioritiesPage() {
-  const { priorities, status, deletePriority } = usePriorities();
+  const { priorities, status, error, deletePriority } = usePriorities();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPriority, setEditingPriority] = useState<TodoPriority | null>(null);
   const [deletingPriorityId, setDeletingPriorityId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   function openCreate() {
     setEditingPriority(null);
@@ -37,9 +38,13 @@ export default function PrioritiesPage() {
   }
 
   async function handleConfirmDelete() {
-    if (deletingPriorityId) {
+    if (!deletingPriorityId) return;
+    setDeleteError(null);
+    try {
       await deletePriority(deletingPriorityId);
       closeDelete();
+    } catch {
+      setDeleteError("Failed to delete priority. Please try again.");
     }
   }
 
@@ -60,7 +65,10 @@ export default function PrioritiesPage() {
         <p className="text-gray-500 dark:text-gray-400">Loading priorities\u2026</p>
       )}
       {status === "error" && (
-        <p className="text-red-600 dark:text-red-400">Failed to load priorities. Try refreshing.</p>
+        <p className="text-red-600 dark:text-red-400">{error ?? "Failed to load priorities. Try refreshing."}</p>
+      )}
+      {deleteError && (
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400 mb-2">{deleteError}</p>
       )}
 
       {status !== "loading" && (

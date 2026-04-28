@@ -8,10 +8,11 @@ import CategoryModal from "@/components/categories/CategoryModal";
 import ConfirmDeleteDialog from "@/components/tasks/ConfirmDeleteDialog";
 
 export default function CategoriesPage() {
-  const { categories, status, deleteCategory } = useCategories();
+  const { categories, status, error, deleteCategory } = useCategories();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<TodoCategory | null>(null);
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   function openCreate() {
     setEditingCategory(null);
@@ -37,9 +38,13 @@ export default function CategoriesPage() {
   }
 
   async function handleConfirmDelete() {
-    if (deletingCategoryId) {
+    if (!deletingCategoryId) return;
+    setDeleteError(null);
+    try {
       await deleteCategory(deletingCategoryId);
       closeDelete();
+    } catch {
+      setDeleteError("Failed to delete category. Please try again.");
     }
   }
 
@@ -60,7 +65,10 @@ export default function CategoriesPage() {
         <p className="text-gray-500 dark:text-gray-400">Loading categories\u2026</p>
       )}
       {status === "error" && (
-        <p className="text-red-600 dark:text-red-400">Failed to load categories. Try refreshing.</p>
+        <p className="text-red-600 dark:text-red-400">{error ?? "Failed to load categories. Try refreshing."}</p>
+      )}
+      {deleteError && (
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400 mb-2">{deleteError}</p>
       )}
 
       {status !== "loading" && (
