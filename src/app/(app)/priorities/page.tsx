@@ -1,0 +1,87 @@
+"use client";
+
+import { useState } from "react";
+import { TodoPriority } from "@/features/priorities/types/priority";
+import { usePriorities } from "@/features/priorities/hooks/usePriorities";
+import PriorityCard from "@/components/priorities/PriorityCard";
+import PriorityModal from "@/components/priorities/PriorityModal";
+import ConfirmDeleteDialog from "@/components/tasks/ConfirmDeleteDialog";
+
+export default function PrioritiesPage() {
+  const { priorities, status, deletePriority } = usePriorities();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingPriority, setEditingPriority] = useState<TodoPriority | null>(null);
+  const [deletingPriorityId, setDeletingPriorityId] = useState<string | null>(null);
+
+  function openCreate() {
+    setEditingPriority(null);
+    setModalOpen(true);
+  }
+
+  function openEdit(priority: TodoPriority) {
+    setEditingPriority(priority);
+    setModalOpen(true);
+  }
+
+  function openDelete(id: string) {
+    setDeletingPriorityId(id);
+  }
+
+  function closeModal() {
+    setModalOpen(false);
+    setEditingPriority(null);
+  }
+
+  function closeDelete() {
+    setDeletingPriorityId(null);
+  }
+
+  async function handleConfirmDelete() {
+    if (deletingPriorityId) {
+      await deletePriority(deletingPriorityId);
+      closeDelete();
+    }
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Priorities</h1>
+        <button
+          type="button"
+          onClick={openCreate}
+          className="rounded px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+        >
+          + New Priority
+        </button>
+      </div>
+
+      {status === "loading" && (
+        <p className="text-gray-500 dark:text-gray-400">Loading priorities\u2026</p>
+      )}
+      {status === "error" && (
+        <p className="text-red-600 dark:text-red-400">Failed to load priorities. Try refreshing.</p>
+      )}
+
+      {status !== "loading" && (
+        <div className="flex flex-col gap-2">
+          {priorities.length === 0 && status === "idle" && (
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
+              No priorities yet. Create one to get started.
+            </p>
+          )}
+          {priorities.map((p) => (
+            <PriorityCard key={p.id} priority={p} onEdit={openEdit} onDelete={openDelete} />
+          ))}
+        </div>
+      )}
+
+      <PriorityModal isOpen={modalOpen} priority={editingPriority} onClose={closeModal} />
+      <ConfirmDeleteDialog
+        taskId={deletingPriorityId}
+        onConfirm={handleConfirmDelete}
+        onCancel={closeDelete}
+      />
+    </div>
+  );
+}
