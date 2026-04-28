@@ -14,9 +14,9 @@ export interface TodoTask {
   createdDt: string;       // ISO 8601, server-assigned on POST; echo on PUT
   dueDt: string | null;    // ISO 8601, nullable; user-controlled optional due date
   isCompleted: boolean;
-  isArchived: boolean;     // always false in Phase 2
-  todoCategoryId: string;  // uuid; Phase 2: null sent as null (verify Pitfall 2 at runtime)
-  todoPriorityId: string;  // uuid; Phase 2: null sent as null
+  isArchived: boolean;          // always false in Phase 2
+  todoCategoryId: string | null; // uuid | null; Phase 2: null when unassigned (verify Pitfall 2 at runtime)
+  todoPriorityId: string | null; // uuid | null; Phase 2: null when unassigned
   syncDt: string;          // ISO 8601; send current timestamp on write
 }
 
@@ -31,7 +31,9 @@ export interface CreateTaskRequest {
   syncDt: string;
 }
 
-export interface UpdateTaskRequest extends CreateTaskRequest {
+export interface UpdateTaskRequest extends Omit<CreateTaskRequest, "isCompleted" | "isArchived"> {
   id: string;         // required: included in body for PUT (full replacement)
   createdDt: string;  // echo back original server-assigned creation timestamp
+  isCompleted: boolean;  // override literal false — updates can toggle completion state
+  isArchived: boolean;   // override literal false — updates can set archived state
 }
