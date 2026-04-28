@@ -14,6 +14,17 @@ import userEvent from "@testing-library/user-event";
 import React from "react";
 
 // ---------------------------------------------------------------------------
+// Mock next/navigation (required now that pages use useRouter for redirect guard)
+// ---------------------------------------------------------------------------
+
+const mockReplace = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: mockReplace,
+  }),
+}));
+
+// ---------------------------------------------------------------------------
 // Mock useAuth so pages don't need a real provider in screen tests
 // ---------------------------------------------------------------------------
 

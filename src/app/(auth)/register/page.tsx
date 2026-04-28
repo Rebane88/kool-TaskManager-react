@@ -6,14 +6,30 @@
  * Wires the registration form to useAuth().register (AUTH-01).
  * Validates all required fields before submitting (T-01-12).
  * On success the provider updates auth status to "authenticated".
+ *
+ * Redirect guard (T-01-21): already-authenticated users are redirected to
+ * /dashboard instead of seeing the register form. During session restore the
+ * loading indicator prevents form flicker.
  */
 
-import React, { useState, FormEvent } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ApiError } from "@/lib/api/apiError";
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { status, register } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
+
+  if (status === "restoring" || status === "authenticated") {
+    return <div aria-label="Loading session">Loading...</div>;
+  }
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
