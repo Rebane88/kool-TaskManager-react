@@ -122,8 +122,8 @@ export const authService = {
 
     refreshInFlight = (async () => {
       try {
-        const currentAccessToken = getAccessToken() ?? "";
-        const currentRefreshToken = getRefreshToken() ?? "";
+        const currentAccessToken = getAccessToken();
+        const currentRefreshToken = getRefreshToken();
 
         const response = await authApi.refresh({
           jwt: currentAccessToken,

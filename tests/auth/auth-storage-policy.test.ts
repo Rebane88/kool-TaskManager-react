@@ -11,7 +11,7 @@ import {
   REFRESH_TOKEN_KEY,
 } from "@/features/auth/storage/refreshTokenStorage";
 
-describe("auth-storage-policy: access token (memory only)", () => {
+describe("auth-storage-policy: access token (memory + localStorage fallback)", () => {
   beforeEach(() => {
     clearAccessToken();
     localStorage.clear();
@@ -33,22 +33,21 @@ describe("auth-storage-policy: access token (memory only)", () => {
     expect(getAccessToken()).toBeNull();
   });
 
-  it("never writes access token to localStorage", () => {
+  it("writes access token to localStorage for hard-refresh recovery", () => {
     const setItemSpy = vi.spyOn(localStorage, "setItem");
     setAccessToken("secret-access-jwt");
-    expect(setItemSpy).not.toHaveBeenCalled();
+    expect(setItemSpy).toHaveBeenCalledWith("jwt", "secret-access-jwt");
   });
 
-  it("never reads access token from localStorage", () => {
-    const getItemSpy = vi.spyOn(localStorage, "getItem");
-    getAccessToken();
-    expect(getItemSpy).not.toHaveBeenCalled();
+  it("falls back to localStorage when memory is empty", () => {
+    localStorage.setItem("jwt", "stored-jwt");
+    expect(getAccessToken()).toBe("stored-jwt");
   });
 
-  it("never removes access token from localStorage", () => {
+  it("removes access token from localStorage on clear", () => {
     const removeItemSpy = vi.spyOn(localStorage, "removeItem");
     clearAccessToken();
-    expect(removeItemSpy).not.toHaveBeenCalled();
+    expect(removeItemSpy).toHaveBeenCalledWith("jwt");
   });
 });
 

@@ -40,10 +40,10 @@ export interface RegisterRequest {
 
 /** Body for POST /Account/RefreshToken — matches RefreshTokenModel schema */
 export interface RefreshTokenRequest {
-  /** Current (possibly expired) access JWT */
-  jwt: string;
+  /** Current (possibly expired) access JWT — null when not available (e.g. after hard refresh) */
+  jwt: string | null;
   /** Valid refresh token */
-  refreshToken: string;
+  refreshToken: string | null;
 }
 
 /** Successful auth response from login, register, and refresh endpoints */
