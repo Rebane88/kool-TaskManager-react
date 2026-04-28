@@ -252,8 +252,17 @@ describe("useAuth: exposes auth actions and status (AUTH-01/AUTH-02/AUTH-03)", (
     expect(typeof capturedAuth!.logout).toBe("function");
   });
 
-  it("initial status is 'unauthenticated'", () => {
+  it("initial status settles to 'unauthenticated' when no refresh token exists", async () => {
+    // Provider starts in 'restoring', then settles to 'unauthenticated' because
+    // getRefreshToken returns null — no session to restore (D-02).
+    vi.mocked(getRefreshToken).mockReturnValue(null);
     renderWithProvider();
+
+    await act(async () => {
+      // Let bootstrap restore effect settle
+      await Promise.resolve();
+    });
+
     expect(capturedAuth!.status).toBe("unauthenticated");
   });
 

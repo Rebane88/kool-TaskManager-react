@@ -9,8 +9,15 @@
  * Auth status states:
  *   "unauthenticated" — no session active
  *   "authenticated"   — access token available in memory
+ *   "restoring"       — bootstrap session restore in progress
  *
  * Actions route through authService which enforces D-01 token policy.
+ *
+ * Bootstrap (D-02): on mount, attempts to restore session from persisted
+ * refresh token via authService.restoreSession.
+ *
+ * 401 wiring (D-03/D-04): registers authService.refreshTokens as the
+ * apiClient 401 handler so 401s trigger single-flight token refresh + retry.
  */
 
 import React, {
@@ -18,10 +25,13 @@ import React, {
   useContext,
   useReducer,
   useCallback,
+  useEffect,
   ReactNode,
 } from "react";
 import { authService, AuthResult } from "@/features/auth/services/authService";
 import { LoginRequest, RegisterRequest } from "@/features/auth/api/authApi";
+import { setUnauthorizedHandler } from "@/lib/api/apiClient";
+import { getAccessToken } from "@/features/auth/storage/tokenMemoryStore";
 
 // ---------------------------------------------------------------------------
 // State shape
@@ -37,7 +47,7 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-  status: "unauthenticated",
+  status: "restoring",
   firstName: null,
   lastName: null,
   error: null,
@@ -50,7 +60,8 @@ const initialState: AuthState = {
 type AuthAction =
   | { type: "AUTH_SUCCESS"; payload: AuthResult }
   | { type: "AUTH_FAILURE"; payload: string }
-  | { type: "LOGOUT" };
+  | { type: "LOGOUT" }
+  | { type: "RESTORE_COMPLETE" };
 
 function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
@@ -63,11 +74,25 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
       };
     case "AUTH_FAILURE":
       return {
-        ...initialState,
+        ...state,
+        status: "unauthenticated",
         error: action.payload,
       };
     case "LOGOUT":
-      return { ...initialState };
+      return {
+        status: "unauthenticated",
+        firstName: null,
+        lastName: null,
+        error: null,
+      };
+    case "RESTORE_COMPLETE":
+      // Bootstrap finished without a token — settle to unauthenticated
+      return {
+        status: "unauthenticated",
+        firstName: null,
+        lastName: null,
+        error: null,
+      };
     default:
       return state;
   }
@@ -91,6 +116,39 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
+
+  // -------------------------------------------------------------------------
+  // Bootstrap session restore (D-02) + apiClient 401 handler wiring (D-03/D-04)
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    // Wire apiClient 401 handler: when a 401 occurs, refresh tokens and return
+    // the new access token for retry injection. Single-flight is handled inside
+    // authService.refreshTokens (D-04).
+    setUnauthorizedHandler(async () => {
+      await authService.refreshTokens();
+      // Return the newly stored access token for the retry request header
+      return getAccessToken() ?? "";
+    });
+
+    // Attempt to restore session from persisted refresh token (D-02)
+    authService.restoreSession().then((result) => {
+      if (result) {
+        dispatch({ type: "AUTH_SUCCESS", payload: result });
+      } else {
+        dispatch({ type: "RESTORE_COMPLETE" });
+      }
+    });
+
+    return () => {
+      // Clean up 401 handler on provider unmount
+      setUnauthorizedHandler(null);
+    };
+  }, []);
+
+  // -------------------------------------------------------------------------
+  // Auth actions
+  // -------------------------------------------------------------------------
 
   const register = useCallback(async (req: RegisterRequest): Promise<void> => {
     try {
