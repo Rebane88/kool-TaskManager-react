@@ -86,8 +86,17 @@ function buildHeaders(
 async function parseApiError(response: Response): Promise<ApiError> {
   let detail: string | undefined;
   try {
-    const errorBody = (await response.json()) as { message?: string };
-    detail = errorBody?.message;
+    const errorBody = (await response.json()) as {
+      messages?: string[];   // PublicApi.DTO.v1.Message — most endpoints
+      message?: string;      // fallback single-message shape
+      title?: string;        // ProblemDetails title
+      detail?: string;       // ProblemDetails detail
+    };
+    if (errorBody?.messages?.length) {
+      detail = errorBody.messages.join(" ");
+    } else {
+      detail = errorBody?.detail ?? errorBody?.title ?? errorBody?.message;
+    }
   } catch {
     // Body not parseable — omit detail
   }
