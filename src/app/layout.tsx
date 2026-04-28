@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/features/auth/state/AuthProvider";
+import { TaskProvider } from "@/features/tasks/state/TaskProvider";
 
 export const metadata: Metadata = {
   title: "TaskManager",
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        {/* TaskProvider is nested inside AuthProvider so it can read useAuth().status */}
+        <AuthProvider>
+          <TaskProvider>{children}</TaskProvider>
+        </AuthProvider>
       </body>
     </html>
   );
