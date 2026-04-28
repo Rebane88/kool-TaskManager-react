@@ -38,8 +38,8 @@ const fakeTasks = [
     dueDt: null,
     isCompleted: false,
     isArchived: false,
-    todoCategoryId: null,
-    todoPriorityId: null,
+    todoCategoryId: "00000000-0000-0000-0000-000000000000",
+    todoPriorityId: "00000000-0000-0000-0000-000000000000",
     syncDt: "2026-01-01T00:00:00Z",
   },
 ];
@@ -118,8 +118,8 @@ describe("taskApi.create — TASK-01", () => {
       dueDt: null,
       isCompleted: false as const,
       isArchived: false as const,
-      todoCategoryId: null,
-      todoPriorityId: null,
+      todoCategoryId: "00000000-0000-0000-0000-000000000000",
+      todoPriorityId: "00000000-0000-0000-0000-000000000000",
       syncDt: "2026-01-01T00:00:00Z",
     };
 
@@ -148,8 +148,8 @@ describe("taskApi.create — TASK-01", () => {
       dueDt: null,
       isCompleted: false as const,
       isArchived: false as const,
-      todoCategoryId: null,
-      todoPriorityId: null,
+      todoCategoryId: "00000000-0000-0000-0000-000000000000",
+      todoPriorityId: "00000000-0000-0000-0000-000000000000",
       syncDt: "2026-01-01T00:00:00Z",
     });
 
@@ -188,8 +188,8 @@ describe("taskApi.update — TASK-03", () => {
       dueDt: null,
       isCompleted: false as const,
       isArchived: false as const,
-      todoCategoryId: null,
-      todoPriorityId: null,
+      todoCategoryId: "00000000-0000-0000-0000-000000000000",
+      todoPriorityId: "00000000-0000-0000-0000-000000000000",
       syncDt: "2026-01-01T00:00:00Z",
     };
 
@@ -221,8 +221,8 @@ describe("taskApi.update — TASK-03", () => {
       dueDt: null,
       isCompleted: false as const,
       isArchived: false as const,
-      todoCategoryId: null,
-      todoPriorityId: null,
+      todoCategoryId: "00000000-0000-0000-0000-000000000000",
+      todoPriorityId: "00000000-0000-0000-0000-000000000000",
       syncDt: "2026-01-01T00:00:00Z",
     };
 

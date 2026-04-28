@@ -15,8 +15,8 @@ export interface TodoTask {
   dueDt: string | null;    // ISO 8601, nullable; user-controlled optional due date
   isCompleted: boolean;
   isArchived: boolean;          // always false in Phase 2
-  todoCategoryId: string | null; // uuid | null; Phase 2: null when unassigned (verify Pitfall 2 at runtime)
-  todoPriorityId: string | null; // uuid | null; Phase 2: null when unassigned
+  todoCategoryId: string;  // uuid; non-nullable per API schema (nullable=false)
+  todoPriorityId: string;  // uuid; non-nullable per API schema (nullable=false)
   syncDt: string;          // ISO 8601; send current timestamp on write
 }
 
@@ -26,8 +26,8 @@ export interface CreateTaskRequest {
   dueDt: string | null;
   isCompleted: false;       // literal false — new tasks are never pre-completed
   isArchived: false;        // literal false — archive not exposed in Phase 2
-  todoCategoryId: string | null;
-  todoPriorityId: string | null;
+  todoCategoryId: string;
+  todoPriorityId: string;
   syncDt: string;
 }
 

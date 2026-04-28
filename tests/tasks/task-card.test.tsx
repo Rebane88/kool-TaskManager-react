@@ -48,8 +48,8 @@ function makeTask(
     dueDt: null,
     isCompleted: false,
     isArchived: false,
-    todoCategoryId: null,
-    todoPriorityId: null,
+    todoCategoryId: "00000000-0000-0000-0000-000000000000",
+    todoPriorityId: "00000000-0000-0000-0000-000000000000",
     syncDt: "2026-01-01T00:00:00Z",
     ...overrides,
   };
