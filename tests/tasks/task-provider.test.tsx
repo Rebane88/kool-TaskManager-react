@@ -34,7 +34,7 @@ vi.mock("@/features/tasks/services/taskService", () => ({
 // ---------------------------------------------------------------------------
 
 vi.mock("@/features/auth/hooks/useAuth", () => ({
-  useAuth: () => ({ status: "authenticated" }),
+  useAuth: vi.fn(() => ({ status: "authenticated" })),
 }));
 
 // ---------------------------------------------------------------------------
@@ -44,6 +44,7 @@ vi.mock("@/features/auth/hooks/useAuth", () => ({
 import { TaskProvider } from "@/features/tasks/state/TaskProvider";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { taskService } from "@/features/tasks/services/taskService";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 // ---------------------------------------------------------------------------
 // Helper: TestConsumer + renderWithProvider
@@ -88,7 +89,9 @@ const newTask = {
 
 describe("TaskProvider: initial load — TASK-02", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.mocked(taskService.getAll).mockResolvedValue([]);
+    vi.mocked(useAuth).mockReturnValue({ status: "authenticated" } as ReturnType<typeof useAuth>);
   });
 
   it("calls taskService.getAll when auth status is authenticated", async () => {
@@ -136,6 +139,8 @@ describe("TaskProvider: initial load — TASK-02", () => {
 
 describe("TaskProvider: createTask — TASK-01", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({ status: "authenticated" } as ReturnType<typeof useAuth>);
     vi.mocked(taskService.getAll).mockResolvedValue([]);
     vi.mocked(taskService.create).mockResolvedValue(newTask);
   });
@@ -173,6 +178,8 @@ describe("TaskProvider: updateTask — TASK-03", () => {
   const updatedTask = { ...newTask, taskName: "Updated task" };
 
   beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({ status: "authenticated" } as ReturnType<typeof useAuth>);
     vi.mocked(taskService.getAll).mockResolvedValue([newTask]);
     vi.mocked(taskService.update).mockResolvedValue(updatedTask);
   });
@@ -202,6 +209,8 @@ describe("TaskProvider: updateTask — TASK-03", () => {
 
 describe("TaskProvider: deleteTask — TASK-04", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({ status: "authenticated" } as ReturnType<typeof useAuth>);
     vi.mocked(taskService.getAll).mockResolvedValue([newTask]);
     vi.mocked(taskService.delete).mockResolvedValue(undefined);
   });
