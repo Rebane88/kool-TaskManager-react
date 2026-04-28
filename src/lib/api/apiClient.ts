@@ -154,12 +154,24 @@ export async function apiClient<T = unknown>(options: ApiRequestOptions): Promis
       throw await parseApiError(retryResponse);
     }
 
-    return retryResponse.json() as Promise<T>;
+    try {
+      return (await retryResponse.json()) as T;
+    } catch {
+      return undefined as unknown as T;
+    }
   }
 
   if (!response.ok) {
     throw await parseApiError(response);
   }
 
-  return response.json() as Promise<T>;
+  // Guard against responses with no body (e.g. DELETE returns HTTP 200 with empty body).
+  // Attempting response.json() on an empty body rejects with SyntaxError — we catch the
+  // rejection and return undefined instead. Callers that use apiClient<unknown> and discard
+  // the result handle this safely (Pitfall 3 guard).
+  try {
+    return (await response.json()) as T;
+  } catch {
+    return undefined as unknown as T;
+  }
 }

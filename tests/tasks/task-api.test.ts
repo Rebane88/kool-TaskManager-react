@@ -12,8 +12,9 @@
  *  - TASK-05: taskApi toggle via update sends PUT with isCompleted: true
  */
 
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { taskApi } from "@/features/tasks/api/taskApi";
+import { setAccessToken, clearAccessToken } from "@/features/auth/storage/tokenMemoryStore";
 
 // ---------------------------------------------------------------------------
 // Fetch mock helper
@@ -50,8 +51,12 @@ const fakeTask = fakeTasks[0];
 // ---------------------------------------------------------------------------
 
 describe("taskApi.getAll — TASK-02", () => {
+  beforeEach(() => {
+    setAccessToken("test-token");
+  });
   afterEach(() => {
     vi.restoreAllMocks();
+    clearAccessToken();
   });
 
   it("sends GET to /api/v1/TodoTasks with Bearer token", async () => {
@@ -91,8 +96,12 @@ describe("taskApi.getAll — TASK-02", () => {
 // ---------------------------------------------------------------------------
 
 describe("taskApi.create — TASK-01", () => {
+  beforeEach(() => {
+    setAccessToken("test-token");
+  });
   afterEach(() => {
     vi.restoreAllMocks();
+    clearAccessToken();
   });
 
   it("sends POST to /api/v1/TodoTasks with request body and Bearer token", async () => {
@@ -153,8 +162,12 @@ describe("taskApi.create — TASK-01", () => {
 // ---------------------------------------------------------------------------
 
 describe("taskApi.update — TASK-03", () => {
+  beforeEach(() => {
+    setAccessToken("test-token");
+  });
   afterEach(() => {
     vi.restoreAllMocks();
+    clearAccessToken();
   });
 
   it("sends PUT to /api/v1/TodoTasks/{id} with full task body and Bearer token", async () => {
@@ -224,8 +237,12 @@ describe("taskApi.update — TASK-03", () => {
 // ---------------------------------------------------------------------------
 
 describe("taskApi.delete — TASK-04", () => {
+  beforeEach(() => {
+    setAccessToken("test-token");
+  });
   afterEach(() => {
     vi.restoreAllMocks();
+    clearAccessToken();
   });
 
   it("sends DELETE to /api/v1/TodoTasks/{id} with Bearer token", async () => {
@@ -265,8 +282,12 @@ describe("taskApi.delete — TASK-04", () => {
 // ---------------------------------------------------------------------------
 
 describe("taskApi toggle via update — TASK-05", () => {
+  beforeEach(() => {
+    setAccessToken("test-token");
+  });
   afterEach(() => {
     vi.restoreAllMocks();
+    clearAccessToken();
   });
 
   it("sends PUT with isCompleted: true when toggling complete", async () => {
