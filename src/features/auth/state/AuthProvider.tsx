@@ -27,7 +27,7 @@ import { LoginRequest, RegisterRequest } from "@/features/auth/api/authApi";
 // State shape
 // ---------------------------------------------------------------------------
 
-export type AuthStatus = "unauthenticated" | "authenticated";
+export type AuthStatus = "restoring" | "unauthenticated" | "authenticated";
 
 export interface AuthState {
   status: AuthStatus;
