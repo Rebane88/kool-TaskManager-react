@@ -30,6 +30,7 @@ import { priorityService } from "@/features/priorities/services/priorityService"
 import { TodoPriority, CreatePriorityRequest } from "@/features/priorities/types/priority";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { EMPTY_GUID } from "@/lib/constants";
+import { formatApiError } from "@/lib/api/apiError";
 
 // ---------------------------------------------------------------------------
 // State shape
@@ -119,7 +120,7 @@ export function PriorityProvider({ children }: { children: ReactNode }) {
         dispatch({ type: "PRIORITIES_LOADED", payload: priorities });
       })
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : "Failed to load priorities";
+        const message = formatApiError(err, "Failed to load priorities");
         dispatch({ type: "PRIORITIES_ERROR", payload: message });
       });
   }, [authStatus]);
@@ -134,7 +135,7 @@ export function PriorityProvider({ children }: { children: ReactNode }) {
       const priorities = await priorityService.getAll();
       dispatch({ type: "PRIORITIES_LOADED", payload: priorities });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load priorities";
+      const message = formatApiError(err, "Failed to load priorities");
       dispatch({ type: "PRIORITIES_ERROR", payload: message });
     }
   }, []);
@@ -153,7 +154,7 @@ export function PriorityProvider({ children }: { children: ReactNode }) {
         const priority = await priorityService.create(req);
         dispatch({ type: "PRIORITY_CREATED", payload: priority });
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to create priority";
+        const message = formatApiError(err, "Failed to create priority");
         dispatch({ type: "PRIORITIES_ERROR", payload: message });
         throw err; // re-throw so UI can handle errors
       }
@@ -171,7 +172,7 @@ export function PriorityProvider({ children }: { children: ReactNode }) {
         await priorityService.update(id, updatedPriority, {});
         dispatch({ type: "PRIORITY_UPDATED", payload: updatedPriority });
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update priority";
+        const message = formatApiError(err, "Failed to update priority");
         dispatch({ type: "PRIORITIES_ERROR", payload: message });
         throw err; // re-throw so UI can handle errors
       }
@@ -184,7 +185,7 @@ export function PriorityProvider({ children }: { children: ReactNode }) {
       await priorityService.delete(id);
       dispatch({ type: "PRIORITY_DELETED", payload: id });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete priority";
+      const message = formatApiError(err, "Failed to delete priority");
       dispatch({ type: "PRIORITIES_ERROR", payload: message });
       throw err; // re-throw so UI can handle errors
     }

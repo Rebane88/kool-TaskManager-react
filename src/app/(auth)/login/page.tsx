@@ -15,7 +15,7 @@
 import React, { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { ApiError } from "@/lib/api/apiError";
+import { formatApiError } from "@/lib/api/apiError";
 
 export default function LoginPage() {
   const { status, login } = useAuth();
@@ -49,11 +49,7 @@ export default function LoginPage() {
     try {
       await login({ email: email.trim(), password });
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.detail ?? err.message);
-      } else {
-        setError("Login failed. Please try again.");
-      }
+      setError(formatApiError(err, "Login failed. Please try again."));
     } finally {
       setPending(false);
     }

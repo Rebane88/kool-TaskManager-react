@@ -26,6 +26,7 @@ import React, {
 import { taskService } from "@/features/tasks/services/taskService";
 import { TodoTask, CreateTaskRequest, UpdateTaskRequest } from "@/features/tasks/types/task";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { formatApiError } from "@/lib/api/apiError";
 
 // ---------------------------------------------------------------------------
 // State shape
@@ -118,7 +119,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         dispatch({ type: "TASKS_LOADED", payload: tasks });
       })
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : "Failed to load tasks";
+        const message = formatApiError(err, "Failed to load tasks");
         dispatch({ type: "TASKS_ERROR", payload: message });
       });
   }, [authStatus]);
@@ -133,7 +134,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       const tasks = await taskService.getAll();
       dispatch({ type: "TASKS_LOADED", payload: tasks });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load tasks";
+      const message = formatApiError(err, "Failed to load tasks");
       dispatch({ type: "TASKS_ERROR", payload: message });
     }
   }, []);
@@ -143,7 +144,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       const task = await taskService.create(req);
       dispatch({ type: "TASK_CREATED", payload: task });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to create task";
+      const message = formatApiError(err, "Failed to create task");
       dispatch({ type: "TASKS_ERROR", payload: message });
       throw err; // re-throw so UI can handle errors
     }
@@ -159,7 +160,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         const updated = await taskService.update(id, task, changes);
         dispatch({ type: "TASK_UPDATED", payload: updated });
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update task";
+        const message = formatApiError(err, "Failed to update task");
         dispatch({ type: "TASKS_ERROR", payload: message });
         throw err; // re-throw so UI can handle errors
       }
@@ -172,7 +173,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       await taskService.delete(id);
       dispatch({ type: "TASK_DELETED", payload: id });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete task";
+      const message = formatApiError(err, "Failed to delete task");
       dispatch({ type: "TASKS_ERROR", payload: message });
       throw err; // re-throw so UI can handle errors
     }
@@ -185,7 +186,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       });
       dispatch({ type: "TASK_UPDATED", payload: updated });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to toggle task";
+      const message = formatApiError(err, "Failed to toggle task");
       dispatch({ type: "TASKS_ERROR", payload: message });
       throw err; // re-throw so UI can handle errors
     }

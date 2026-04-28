@@ -26,6 +26,7 @@ import React, {
 import { categoryService } from "@/features/categories/services/categoryService";
 import { TodoCategory, CreateCategoryRequest, UpdateCategoryRequest } from "@/features/categories/types/category";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { formatApiError } from "@/lib/api/apiError";
 
 // ---------------------------------------------------------------------------
 // State shape
@@ -115,7 +116,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         dispatch({ type: "CATEGORIES_LOADED", payload: categories });
       })
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : "Failed to load categories";
+        const message = formatApiError(err, "Failed to load categories");
         dispatch({ type: "CATEGORIES_ERROR", payload: message });
       });
   }, [authStatus]);
@@ -130,7 +131,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
       const categories = await categoryService.getAll();
       dispatch({ type: "CATEGORIES_LOADED", payload: categories });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load categories";
+      const message = formatApiError(err, "Failed to load categories");
       dispatch({ type: "CATEGORIES_ERROR", payload: message });
     }
   }, []);
@@ -147,7 +148,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         const category = await categoryService.create(req);
         dispatch({ type: "CATEGORY_CREATED", payload: category });
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to create category";
+        const message = formatApiError(err, "Failed to create category");
         dispatch({ type: "CATEGORIES_ERROR", payload: message });
         throw err; // re-throw so UI can handle errors
       }
@@ -166,7 +167,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
         const category = await categoryService.update(id, updatedCategory, changes);
         dispatch({ type: "CATEGORY_UPDATED", payload: category });
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update category";
+        const message = formatApiError(err, "Failed to update category");
         dispatch({ type: "CATEGORIES_ERROR", payload: message });
         throw err; // re-throw so UI can handle errors
       }
@@ -179,7 +180,7 @@ export function CategoryProvider({ children }: { children: ReactNode }) {
       await categoryService.delete(id);
       dispatch({ type: "CATEGORY_DELETED", payload: id });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete category";
+      const message = formatApiError(err, "Failed to delete category");
       dispatch({ type: "CATEGORIES_ERROR", payload: message });
       throw err; // re-throw so UI can handle errors
     }
