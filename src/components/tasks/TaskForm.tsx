@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import { TodoTask } from "@/features/tasks/types/task";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
-import { EMPTY_GUID } from "@/lib/constants";
 import { formatApiError } from "@/lib/api/apiError";
+import { useCategories } from "@/features/categories/hooks/useCategories";
+import { usePriorities } from "@/features/priorities/hooks/usePriorities";
 
 interface TaskFormProps {
   task?: TodoTask | null; // undefined/null = create mode (empty form), TodoTask = edit mode (pre-filled)
@@ -13,14 +14,20 @@ interface TaskFormProps {
 
 export default function TaskForm({ task, onClose }: TaskFormProps) {
   const { createTask, updateTask } = useTasks();
+  const { categories } = useCategories();
+  const { priorities } = usePriorities();
   const [taskName, setTaskName] = useState(task?.taskName ?? "");
   // dueDt in the API is ISO 8601 datetime, but the date input uses YYYY-MM-DD.
   // Extract just the date portion for the input value; send full ISO string on submit.
   const [dueDt, setDueDt] = useState(
     task?.dueDt ? task.dueDt.substring(0, 10) : ""
   );
+  const [categoryId, setCategoryId] = useState(task?.todoCategoryId ?? "");
+  const [priorityId, setPriorityId] = useState(task?.todoPriorityId ?? "");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const missingPrerequisites = categories.length === 0 || priorities.length === 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -36,6 +43,15 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
       return;
     }
 
+    if (!categoryId) {
+      setError("Please select a category.");
+      return;
+    }
+    if (!priorityId) {
+      setError("Please select a priority.");
+      return;
+    }
+
     // Convert date-only string back to ISO 8601 for the API; null if empty
     const dueDtIso = dueDt ? `${dueDt}T00:00:00.000Z` : null;
 
@@ -46,6 +62,8 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         await updateTask(task.id, task, {
           taskName: trimmedName,
           dueDt: dueDtIso,
+          todoCategoryId: categoryId,
+          todoPriorityId: priorityId,
         });
       } else {
         // Create mode: send full CreateTaskRequest with all required defaults
@@ -55,8 +73,8 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           dueDt: dueDtIso,
           isCompleted: false,
           isArchived: false,
-          todoCategoryId: EMPTY_GUID,
-          todoPriorityId: EMPTY_GUID,
+          todoCategoryId: categoryId,
+          todoPriorityId: priorityId,
           syncDt: new Date().toISOString(),
         });
       }
@@ -104,6 +122,60 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           className="rounded border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
+
+      {/* Category select — D-04, D-05, D-06 */}
+      <div>
+        <label
+          htmlFor="task-category"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          Category <span aria-hidden="true">*</span>
+        </label>
+        <select
+          id="task-category"
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+          required
+          disabled={categories.length === 0}
+          className="w-full rounded border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <option value="">Select a category</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>{c.categoryName}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Priority select — D-04, D-05, D-06 */}
+      <div>
+        <label
+          htmlFor="task-priority"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          Priority <span aria-hidden="true">*</span>
+        </label>
+        <select
+          id="task-priority"
+          value={priorityId}
+          onChange={(e) => setPriorityId(e.target.value)}
+          required
+          disabled={priorities.length === 0}
+          className="w-full rounded border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          <option value="">Select a priority</option>
+          {priorities.map((p) => (
+            <option key={p.id} value={p.id}>{p.priorityName}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* D-08: prerequisite message when no options exist */}
+      {missingPrerequisites && (
+        <p className="text-sm text-amber-600 dark:text-amber-400">
+          Please create a category and priority before adding tasks.
+        </p>
+      )}
+
       {error && (
         <p role="alert" className="text-sm text-red-600 dark:text-red-400">
           {error}
@@ -120,7 +192,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         </button>
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || missingPrerequisites}
           className="rounded px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
         >
           {submitting ? "Saving\u2026" : task ? "Save" : "Create"}
