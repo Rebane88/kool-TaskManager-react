@@ -34,19 +34,19 @@ describe("auth-storage-policy: access token (memory only)", () => {
   });
 
   it("never writes access token to localStorage", () => {
-    const setItemSpy = vi.spyOn(Storage.prototype, "setItem");
+    const setItemSpy = vi.spyOn(localStorage, "setItem");
     setAccessToken("secret-access-jwt");
     expect(setItemSpy).not.toHaveBeenCalled();
   });
 
   it("never reads access token from localStorage", () => {
-    const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+    const getItemSpy = vi.spyOn(localStorage, "getItem");
     getAccessToken();
     expect(getItemSpy).not.toHaveBeenCalled();
   });
 
   it("never removes access token from localStorage", () => {
-    const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
+    const removeItemSpy = vi.spyOn(localStorage, "removeItem");
     clearAccessToken();
     expect(removeItemSpy).not.toHaveBeenCalled();
   });
@@ -78,19 +78,19 @@ describe("auth-storage-policy: refresh token (localStorage)", () => {
   });
 
   it("uses localStorage.setItem to persist the refresh token", () => {
-    const setItemSpy = vi.spyOn(Storage.prototype, "setItem");
+    const setItemSpy = vi.spyOn(localStorage, "setItem");
     setRefreshToken("test-refresh-token");
     expect(setItemSpy).toHaveBeenCalledWith(REFRESH_TOKEN_KEY, "test-refresh-token");
   });
 
   it("uses localStorage.getItem to retrieve the refresh token", () => {
-    const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+    const getItemSpy = vi.spyOn(localStorage, "getItem");
     getRefreshToken();
     expect(getItemSpy).toHaveBeenCalledWith(REFRESH_TOKEN_KEY);
   });
 
   it("uses localStorage.removeItem to clear the refresh token", () => {
-    const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
+    const removeItemSpy = vi.spyOn(localStorage, "removeItem");
     clearRefreshToken();
     expect(removeItemSpy).toHaveBeenCalledWith(REFRESH_TOKEN_KEY);
   });
