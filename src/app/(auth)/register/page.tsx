@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ApiError } from "@/lib/api/apiError";
@@ -8,6 +9,12 @@ import { ApiError } from "@/lib/api/apiError";
 export default function RegisterPage() {
   const { status, register } = useAuth();
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -18,12 +25,6 @@ export default function RegisterPage() {
   if (status === "restoring" || status === "authenticated") {
     return <div aria-label="Loading session">Loading...</div>;
   }
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -135,6 +136,13 @@ export default function RegisterPage() {
           {pending ? "Creating account…" : "Register"}
         </button>
       </form>
+
+      <p className="text-sm text-center text-ink-muted">
+        Already have an account?{" "}
+        <Link href="/login" className="text-action hover:underline">
+          Log in
+        </Link>
+      </p>
     </div>
   );
 }

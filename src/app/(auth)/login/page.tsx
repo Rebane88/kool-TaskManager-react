@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { formatApiError } from "@/lib/api/apiError";
@@ -93,6 +94,13 @@ export default function LoginPage() {
           {pending ? "Logging in…" : "Log in"}
         </button>
       </form>
+
+      <p className="text-sm text-center text-ink-muted">
+        Don&apos;t have an account?{" "}
+        <Link href="/register" className="text-action hover:underline">
+          Register
+        </Link>
+      </p>
     </div>
   );
 }
