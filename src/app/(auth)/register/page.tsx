@@ -1,17 +1,5 @@
 "use client";
 
-/**
- * Register page.
- *
- * Wires the registration form to useAuth().register (AUTH-01).
- * Validates all required fields before submitting (T-01-12).
- * On success the provider updates auth status to "authenticated".
- *
- * Redirect guard (T-01-21): already-authenticated users are redirected to
- * /dashboard instead of seeing the register form. During session restore the
- * loading indicator prevents form flicker.
- */
-
 import React, { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -41,7 +29,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
 
-    // Required field validation — all four fields must be non-empty (T-01-12)
     if (!email.trim() || !password || !firstName.trim() || !lastName.trim()) {
       return;
     }
@@ -66,12 +53,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-sm space-y-6">
-      <h1 className="text-2xl font-semibold text-center">Create account</h1>
+    <div className="modal-surface w-full max-w-sm p-8 space-y-6">
+      <h1 className="text-2xl font-semibold text-center text-ink">Create account</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <div className="space-y-1">
-          <label htmlFor="firstName" className="block text-sm font-medium">
+          <label htmlFor="firstName" className="block text-sm font-medium text-ink-muted">
             First name
           </label>
           <input
@@ -81,13 +68,13 @@ export default function RegisterPage() {
             required
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full rounded border border-outline px-3 py-2 text-sm bg-surface text-ink"
             placeholder="Jane"
           />
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="lastName" className="block text-sm font-medium">
+          <label htmlFor="lastName" className="block text-sm font-medium text-ink-muted">
             Last name
           </label>
           <input
@@ -97,13 +84,13 @@ export default function RegisterPage() {
             required
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full rounded border border-outline px-3 py-2 text-sm bg-surface text-ink"
             placeholder="Doe"
           />
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="email" className="block text-sm font-medium">
+          <label htmlFor="email" className="block text-sm font-medium text-ink-muted">
             Email
           </label>
           <input
@@ -113,13 +100,13 @@ export default function RegisterPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full rounded border border-outline px-3 py-2 text-sm bg-surface text-ink"
             placeholder="you@example.com"
           />
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="password" className="block text-sm font-medium">
+          <label htmlFor="password" className="block text-sm font-medium text-ink-muted">
             Password
           </label>
           <input
@@ -129,13 +116,13 @@ export default function RegisterPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full rounded border border-outline px-3 py-2 text-sm bg-surface text-ink"
             placeholder="••••••••"
           />
         </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-danger">
             {error}
           </p>
         )}
@@ -143,7 +130,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="w-full rounded bg-action px-4 py-2 text-sm font-medium text-action-text hover:bg-action-hover disabled:opacity-50 transition-colors"
         >
           {pending ? "Creating account…" : "Register"}
         </button>

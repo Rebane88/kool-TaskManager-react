@@ -8,8 +8,8 @@ interface TaskCardProps {
   task: TodoTask;
   onEdit: (task: TodoTask) => void;
   onDelete: (id: string) => void;
-  categoryName?: string;   // resolved from CategoryProvider by parent
-  priorityName?: string;   // resolved from PriorityProvider by parent
+  categoryName?: string;
+  priorityName?: string;
 }
 
 function formatDueDate(dueDt: string): string {
@@ -30,8 +30,7 @@ export default function TaskCard({ task, onEdit, onDelete, categoryName, priorit
   return (
     <div
       className={[
-        "rounded border p-3 shadow-sm flex items-start gap-3",
-        "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700",
+        "card-surface p-3 flex items-start gap-3",
         task.isCompleted ? "opacity-60" : "",
       ].join(" ")}
     >
@@ -40,31 +39,31 @@ export default function TaskCard({ task, onEdit, onDelete, categoryName, priorit
         checked={task.isCompleted}
         onChange={() => void toggleComplete(task)}
         aria-label={task.isCompleted ? "Mark incomplete" : "Mark complete"}
-        className="mt-1 h-4 w-4 rounded border-gray-300 accent-blue-600 cursor-pointer"
+        className="mt-1 h-4 w-4 rounded border-outline accent-action cursor-pointer"
       />
       <div className="flex-1 min-w-0">
         <span
           className={[
             "block text-sm font-medium truncate",
-            task.isCompleted ? "line-through text-gray-400" : "text-gray-900 dark:text-gray-100",
+            task.isCompleted ? "line-through text-ink-faint" : "text-ink",
           ].join(" ")}
         >
           {task.taskName}
         </span>
         {task.dueDt && (
-          <span className="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          <span className="block text-xs text-ink-muted mt-0.5">
             {formatDueDate(task.dueDt)}
           </span>
         )}
         {(priorityName || categoryName) && (
-          <div className="flex gap-1 mt-1">
+          <div className="flex gap-1 mt-1.5">
             {priorityName && (
-              <span className="text-xs px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
+              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium">
                 {priorityName}
               </span>
             )}
             {categoryName && (
-              <span className="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-100/10 dark:text-blue-300">
+              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                 {categoryName}
               </span>
             )}
@@ -75,14 +74,14 @@ export default function TaskCard({ task, onEdit, onDelete, categoryName, priorit
         <button
           type="button"
           onClick={() => onEdit(task)}
-          className="rounded px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="rounded px-2 py-1 text-xs font-medium text-ink-muted hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-ink transition-colors"
         >
           Edit
         </button>
         <button
           type="button"
           onClick={() => onDelete(task.id)}
-          className="rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+          className="rounded px-2 py-1 text-xs font-medium text-danger hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
         >
           Delete
         </button>

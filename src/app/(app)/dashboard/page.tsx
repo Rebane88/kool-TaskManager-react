@@ -7,7 +7,9 @@ import { TodoTask } from "@/features/tasks/types/task";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { useCategories } from "@/features/categories/hooks/useCategories";
 import { usePriorities } from "@/features/priorities/hooks/usePriorities";
+import { useTaskFilters } from "@/features/tasks/hooks/useTaskFilters";
 import TaskList from "@/components/tasks/TaskList";
+import TaskFilterBar from "@/components/tasks/TaskFilterBar";
 import TaskModal from "@/components/tasks/TaskModal";
 import ConfirmDeleteDialog from "@/components/tasks/ConfirmDeleteDialog";
 
@@ -16,11 +18,18 @@ export default function DashboardPage() {
   const { categories, status: categoryStatus } = useCategories();
   const { priorities, status: priorityStatus } = usePriorities();
 
-  // Modal state (D-01: modal for create/edit, no route change)
+  const {
+    visibleTasks,
+    search, setSearch,
+    categoryId, setCategoryId,
+    priorityId, setPriorityId,
+    statusFilter, setStatusFilter,
+    sortBy, setSortBy,
+  } = useTaskFilters(tasks, categories, priorities);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TodoTask | null>(null);
 
-  // Delete confirmation state (D-07: confirm before delete)
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -66,11 +75,11 @@ export default function DashboardPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Tasks</h1>
+        <h1 className="text-2xl font-semibold text-ink">Tasks</h1>
         <button
           type="button"
           onClick={openCreate}
-          className="rounded px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+          className="rounded px-4 py-2 text-sm font-medium bg-action hover:bg-action-hover text-action-text transition-colors"
         >
           + New Task
         </button>
@@ -90,18 +99,31 @@ export default function DashboardPage() {
         </div>
       )}
 
+      <TaskFilterBar
+        search={search} onSearch={setSearch}
+        categoryId={categoryId} onCategory={setCategoryId} categories={categories}
+        priorityId={priorityId} onPriority={setPriorityId} priorities={priorities}
+        statusFilter={statusFilter} onStatus={setStatusFilter}
+        sortBy={sortBy} onSort={setSortBy}
+      />
+
       {status === "loading" && (
-        <p className="text-gray-500 dark:text-gray-400">Loading tasks\u2026</p>
+        <p className="text-ink-muted">Loading tasks…</p>
       )}
       {status === "error" && (
-        <p className="text-red-600 dark:text-red-400">{error ?? "Failed to load tasks. Try refreshing."}</p>
+        <p className="text-danger">{error ?? "Failed to load tasks. Try refreshing."}</p>
       )}
       {deleteError && (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400 mb-2">{deleteError}</p>
+        <p role="alert" className="text-sm text-danger mb-2">{deleteError}</p>
       )}
 
-      {status !== "loading" && (
-        <TaskList tasks={tasks} onEdit={openEdit} onDelete={openDelete} />
+      {status !== "loading" && tasks.length > 0 && visibleTasks.length === 0 && (
+        <p className="text-ink-muted py-8 text-center">
+          No tasks match your filters.
+        </p>
+      )}
+      {status !== "loading" && (tasks.length === 0 || visibleTasks.length > 0) && (
+        <TaskList tasks={visibleTasks} onEdit={openEdit} onDelete={openDelete} />
       )}
 
       <TaskModal isOpen={modalOpen} task={editingTask} onClose={closeModal} />

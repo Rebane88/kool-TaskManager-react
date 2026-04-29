@@ -1,0 +1,12 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  tags:
+    - shared
+  only:
+    - main
+  script:
+    - docker compose down || true
+    - docker compose up -d --build

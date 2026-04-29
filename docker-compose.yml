@@ -1,0 +1,6 @@
+services:
+  taskmanager-react:
+    build: .
+    ports:
+      - "89:80"
+    restart: unless-stopped

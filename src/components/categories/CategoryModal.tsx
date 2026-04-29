@@ -20,8 +20,8 @@ export default function CategoryModal({ isOpen, category, onClose }: CategoryMod
       aria-modal="true"
       aria-labelledby="category-modal-title"
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
-        <h2 id="category-modal-title" className="text-base font-semibold mb-4">
+      <div className="modal-surface p-6 w-full max-w-md mx-4">
+        <h2 id="category-modal-title" className="text-base font-semibold mb-4 text-ink">
           {category ? "Edit Category" : "New Category"}
         </h2>
         <CategoryForm category={category} onClose={onClose} />

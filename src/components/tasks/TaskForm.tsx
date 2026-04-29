@@ -8,17 +8,21 @@ import { useCategories } from "@/features/categories/hooks/useCategories";
 import { usePriorities } from "@/features/priorities/hooks/usePriorities";
 
 interface TaskFormProps {
-  task?: TodoTask | null; // undefined/null = create mode (empty form), TodoTask = edit mode (pre-filled)
+  task?: TodoTask | null;
   onClose: () => void;
 }
+
+const inputClass =
+  "w-full rounded border border-outline px-3 py-2 text-sm bg-surface text-ink disabled:opacity-50";
+
+const selectClass =
+  "w-full rounded border border-outline px-3 py-2 text-sm bg-surface text-ink disabled:opacity-50";
 
 export default function TaskForm({ task, onClose }: TaskFormProps) {
   const { createTask, updateTask } = useTasks();
   const { categories } = useCategories();
   const { priorities } = usePriorities();
   const [taskName, setTaskName] = useState(task?.taskName ?? "");
-  // dueDt in the API is ISO 8601 datetime, but the date input uses YYYY-MM-DD.
-  // Extract just the date portion for the input value; send full ISO string on submit.
   const [dueDt, setDueDt] = useState(
     task?.dueDt ? task.dueDt.substring(0, 10) : ""
   );
@@ -52,13 +56,11 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
       return;
     }
 
-    // Convert date-only string back to ISO 8601 for the API; null if empty
     const dueDtIso = dueDt ? `${dueDt}T00:00:00.000Z` : null;
 
     setSubmitting(true);
     try {
       if (task) {
-        // Edit mode: send only the changed fields (taskService.update spreads the rest)
         await updateTask(task.id, task, {
           taskName: trimmedName,
           dueDt: dueDtIso,
@@ -66,7 +68,6 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           todoPriorityId: priorityId,
         });
       } else {
-        // Create mode: send full CreateTaskRequest with all required defaults
         await createTask({
           taskName: trimmedName,
           taskSort: 0,
@@ -91,7 +92,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
       <div>
         <label
           htmlFor="task-name"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-ink-muted mb-1"
         >
           Task name <span aria-hidden="true">*</span>
         </label>
@@ -104,30 +105,29 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           required
           autoFocus
           placeholder="What needs to be done?"
-          className="w-full rounded border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={inputClass}
         />
       </div>
       <div>
         <label
           htmlFor="task-due-dt"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-ink-muted mb-1"
         >
-          Due date <span className="text-gray-400 font-normal">(optional)</span>
+          Due date <span className="text-ink-faint font-normal">(optional)</span>
         </label>
         <input
           id="task-due-dt"
           type="date"
           value={dueDt}
           onChange={(e) => setDueDt(e.target.value)}
-          className="rounded border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="rounded border border-outline px-3 py-2 text-sm bg-surface text-ink"
         />
       </div>
 
-      {/* Category select — D-04, D-05, D-06 */}
       <div>
         <label
           htmlFor="task-category"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-ink-muted mb-1"
         >
           Category <span aria-hidden="true">*</span>
         </label>
@@ -137,7 +137,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           onChange={(e) => setCategoryId(e.target.value)}
           required
           disabled={categories.length === 0}
-          className="w-full rounded border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className={selectClass}
         >
           <option value="">Select a category</option>
           {categories.map((c) => (
@@ -146,11 +146,10 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         </select>
       </div>
 
-      {/* Priority select — D-04, D-05, D-06 */}
       <div>
         <label
           htmlFor="task-priority"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-ink-muted mb-1"
         >
           Priority <span aria-hidden="true">*</span>
         </label>
@@ -160,7 +159,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           onChange={(e) => setPriorityId(e.target.value)}
           required
           disabled={priorities.length === 0}
-          className="w-full rounded border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className={selectClass}
         >
           <option value="">Select a priority</option>
           {priorities.map((p) => (
@@ -169,7 +168,6 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
         </select>
       </div>
 
-      {/* D-08: prerequisite message when no options exist */}
       {missingPrerequisites && (
         <p className="text-sm text-amber-600 dark:text-amber-400">
           Please create a category and priority before adding tasks.
@@ -177,7 +175,7 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
       )}
 
       {error && (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}
@@ -186,16 +184,16 @@ export default function TaskForm({ task, onClose }: TaskFormProps) {
           type="button"
           onClick={onClose}
           disabled={submitting}
-          className="rounded px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="rounded px-4 py-2 text-sm font-medium text-ink-muted hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={submitting || missingPrerequisites}
-          className="rounded px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+          className="rounded px-4 py-2 text-sm font-medium bg-action hover:bg-action-hover text-action-text disabled:opacity-50 transition-colors"
         >
-          {submitting ? "Saving\u2026" : task ? "Save" : "Create"}
+          {submitting ? "Saving…" : task ? "Save" : "Create"}
         </button>
       </div>
     </form>

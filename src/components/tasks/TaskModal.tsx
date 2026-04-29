@@ -6,7 +6,7 @@ import TaskForm from "@/components/tasks/TaskForm";
 
 interface TaskModalProps {
   isOpen: boolean;
-  task: TodoTask | null; // null = create mode, TodoTask = edit mode (D-02)
+  task: TodoTask | null;
   onClose: () => void;
 }
 
@@ -20,10 +20,10 @@ export default function TaskModal({ isOpen, task, onClose }: TaskModalProps) {
       aria-modal="true"
       aria-labelledby="task-modal-title"
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
+      <div className="modal-surface p-6 w-full max-w-md mx-4">
         <h2
           id="task-modal-title"
-          className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100"
+          className="text-lg font-semibold mb-4 text-ink"
         >
           {task ? "Edit Task" : "New Task"}
         </h2>

@@ -18,7 +18,7 @@ export default function TaskList({ tasks, onEdit, onDelete }: TaskListProps) {
 
   if (tasks.length === 0) {
     return (
-      <p className="text-gray-500 dark:text-gray-400 py-8 text-center">
+      <p className="text-ink-muted py-8 text-center">
         No tasks yet. Create your first task.
       </p>
     );
