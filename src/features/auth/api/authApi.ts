@@ -16,7 +16,7 @@
 import { apiClient } from "@/lib/api/apiClient";
 
 const API_VERSION = "1";
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://taltech.akaver.com";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://robreb-express.proxy.itcollege.ee";
 
 function endpoint(path: string): string {
   return `${BASE_URL}/api/v${API_VERSION}/${path}`;
