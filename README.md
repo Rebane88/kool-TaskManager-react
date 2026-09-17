@@ -4,8 +4,6 @@ School project for TalTech IT College — a task management web app built with
 Next.js, React and TypeScript against the course teaching API
 (`taltech.akaver.com`). Not intended for production use.
 
-Live demo: https://robreb-react.proxy.itcollege.ee
-
 ## Features
 
 - Email/password auth with JWT access + refresh token sessions

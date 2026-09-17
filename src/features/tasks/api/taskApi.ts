@@ -16,7 +16,7 @@ import { getAccessToken } from "@/features/auth/storage/tokenMemoryStore";
 import { TodoTask, CreateTaskRequest, UpdateTaskRequest } from "@/features/tasks/types/task";
 
 const API_VERSION = "1";
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://robreb-express.proxy.itcollege.ee";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://taltech.akaver.com";
 
 function endpoint(path: string): string {
   return `${BASE_URL}/api/v${API_VERSION}/${path}`;
